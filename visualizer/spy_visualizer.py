@@ -10,29 +10,39 @@ import torch
 
 
 class ODE():
+   
     def __init__(self, initial_length_m=0.12, cable_distance_m=0.0004, ode_step_ds=0.0005, 
                  axial_coupling_coefficient=0.0): 
+        """
+        初始化 ODE 求解器。
+        Args:
+            initial_length_m (float): 机器人的参考长度 (单位: 米)。
+            cable_distance_m (float): 缆绳到中心线的径向距离 (单位: 米)。
+            ode_step_ds (float): ODE 积分步长。
+            axial_coupling_coefficient (float): 弯曲导致轴向应变的耦合系数 (经验值, 通常为负数或零)。
+        """
+       
         self.l = 0.0 
         self.uy = 0.0 
         self.ux = 0.0 
         self.dp = 0   
         self.err = np.array([0.0, 0.0, 0.0]) 
         self.errp = np.array([0.0, 0.0, 0.0])
-        self.simCableLength = 0 #
+        self.simCableLength = 0 
 
         # --- 设置核心物理参数 ---
         self.l0 = initial_length_m    
-        self.d = cable_distance_m   
+        self.d = cable_distance_m     
         self.ds = ode_step_ds        
         self.k_strain = axial_coupling_coefficient 
        # --- 初始化应变 ---
-        self.epsilon = 0.0 
-
-        self.states = None 
+        self.epsilon = 0.0 # <<< 初始化轴向应变
+ 
+        self.states = None # 可以先设为 None
 
         self.action = np.zeros(3)
 
-        self._reset_y0()   
+        self._reset_y0()    
 
 
     def _reset_y0(self, initialize=False): 
@@ -41,16 +51,20 @@ class ODE():
          R0 = np.eye(3,3)
          R0 = np.reshape(R0,(9,1))
          y0 = np.concatenate((r0, R0), axis=0)
+         self.states = np.squeeze(np.asarray(y0))
          self.y0 = np.copy(self.states)
          if initialize:
              self.action = np.zeros(3)
-            
+                
 
     def _update_l0(self,l0):
         self.l0 = l0
+        
 
     def updateAction(self,action):
         self.l  = self.l0 + action[0]
+        
+        # 计算曲率 ux, uy (添加除零保护)
         denominator = self.l * self.d
         if abs(denominator) > 1e-9:
             self.uy = (action[1]) / denominator
@@ -59,15 +73,19 @@ class ODE():
             self.uy = 0.0
             self.ux = 0.0
 
+        # <<< 新增：计算并存储轴向应变 >>>
         self.epsilon = self._calculate_axial_strain() 
+
 
 
     def odeFunction(self,s,y):
         dydt  = np.zeros(12)
+        # % 12 elements are r (3) and R (9), respectively
         e3    = np.array([0,0,1]).reshape(3,1)              
         u_hat = np.array([[0,0,self.uy], [0, 0, -self.ux],[-self.uy, self.ux, 0]])
         r     = y[0:3].reshape(3,1)  #从状态向量 y 中提取并重塑成的 3x1 位置向量 r(s)。
         R     = np.array( [y[3:6],y[6:9],y[9:12]]).reshape(3,3) #从状态向量 y 中提取并重塑成的 3x3 旋转矩阵 R(s)。
+        # % odes
         dR  = R @ u_hat
         dr  = (1 + self.epsilon) * (R @ e3) # 位置向量对弧长s的导数,当epsilon小于0时，dr的模长小于1。沿着s移动ds时，前进距离变小，总长度L变小。
         dRR = dR.T
@@ -90,7 +108,12 @@ class ODE():
 
 
     def _calculate_axial_strain(self):
+        """
+        根据弯曲曲率计算近似的轴向应变 (epsilon)。
+        这是一个简化的经验模型，假设弯曲会导致压缩。
+        """
         curvature_squared = self.ux**2 + self.uy**2
+
 
         calculated_epsilon = self.k_strain * curvature_squared * self.l0 
  
@@ -98,12 +121,23 @@ class ODE():
     
     
     def set_kinematic_state_spy(self, length_change_signal, ux_input, uy_input):
+        """
+        直接设置ODE对象当前的运动学状态（长度变化、曲率）。
 
+    Args:
+        length_change_signal (float): 代表轴向长度变化的信号
+                                      (通常是 avg_dl * axial_scale)。
+        ux_input (float): 要使用的 x 方向曲率 (绕 y 轴)。
+        uy_input (float): 要使用的 y 方向曲率 (绕 x 轴)。
+        """
+    # 1. 更新参考长度 (仍然需要 length_change_signal)
         self.l = self.l0 + length_change_signal
 
+    # 2. 直接设置内部曲率
         self.ux = ux_input
         self.uy = uy_input
 
+    # 3. 基于新的 ux, uy 计算应变
         self.epsilon = self._calculate_axial_strain()
 
 
