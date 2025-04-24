@@ -12,7 +12,6 @@ import utils
 softmanisim_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.append(softmanisim_path)
 from visualizer.spy_visualizer import ODE
-print("[调试] 成功从 'visualizer.visualizer' 导入 ODE")
 
 
 if __name__ == "__main__":
@@ -24,7 +23,7 @@ if __name__ == "__main__":
     # OUTPUT_RESULTS_PATH = 'D:/data/save_data/5(u_new_4,cab=0.035,k=-20,a=1).xlsx'
     OUTPUT_RESULTS_PATH = 'D:/data/save_data/0(u_new_4,cab=0.04,k=-20,a=1).xlsx'
     
-
+    # ---机器人参数---
     num_cables = 3 
     cable_distance = 0.04
     initial_length = 0.12
@@ -34,6 +33,7 @@ if __name__ == "__main__":
     axial_strain_coefficient = -20
     AXIAL_ACTION_SCALE = 1
 
+    #---机器人可视化参数---
     body_color = [1, 0.0, 0.0, 1]
     head_color = [0.0, 0.0, 0.75, 1]
     body_sphere_radius = 0.02
@@ -122,13 +122,11 @@ if __name__ == "__main__":
         current_real_xyz_mm = real_xyz_mm[current_row_index]
 
         # --- 计算新形态 ---
-        # my_ode._reset_y0()
+        my_ode._reset_y0()
         ux, uy = utils.calculate_curvatures_from_dl_v3(dl_segment, cable_distance, L0_seg, AXIAL_ACTION_SCALE)
         avg_dl = np.mean(dl_segment)
         commanded_length_change = avg_dl * AXIAL_ACTION_SCALE
         
-        # action_ode_segment = convert_curvatures_to_ode_action(ux, uy, commanded_length_change, cable_distance, L0_seg)
-        # my_ode.updateAction(action_ode_segment)
         my_ode.set_kinematic_state_spy(commanded_length_change, ux, uy)
         sol = my_ode.odeStepFull()
 
@@ -175,6 +173,6 @@ if __name__ == "__main__":
     p.disconnect(physicsClientId)
 
     # --- 保存结果 ---
-    # utils.save_results_to_excel(results_data, OUTPUT_RESULTS_PATH)
+    utils.save_results_to_excel(results_data, OUTPUT_RESULTS_PATH)
 
     print("--- 仿真结束 ---")
