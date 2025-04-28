@@ -47,7 +47,7 @@ def append_result(results_dict, cblen_mm, real_xyz_mm, sim_xyz_m):
     results_dict['Y_real_mm'].append(real_xyz_mm[1])
     results_dict['Z_real_mm'].append(real_xyz_mm[2])
 
-    sim_x_mm = sim_xyz_m[0] * 1000.0 if not np.isnan(sim_xyz_m[0]) else np.nan
+    sim_x_mm = sim_xyz_m[0] * -1000.0 if not np.isnan(sim_xyz_m[0]) else np.nan
     sim_y_mm = sim_xyz_m[1] * -1000.0 if not np.isnan(sim_xyz_m[1]) else np.nan
     sim_z_mm = sim_xyz_m[2] * 1000.0 - 480 if not np.isnan(sim_xyz_m[2]) else np.nan
     results_dict['sim_X_mm'].append(sim_x_mm)
