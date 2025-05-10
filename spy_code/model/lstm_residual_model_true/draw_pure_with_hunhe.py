@@ -15,12 +15,12 @@ except Exception as e:
 # --- 1. 配置参数 ---
 # 输入的 Excel 文件路径 (由上一个脚本生成)
 # MODEL_SAVE_DIR 应该与 load_lstm_and_predict_to_excel.py 中的一致
-MODEL_OUTPUT_DIR = 'D:/data/save_model/lstm_residual_model_true' # <<<< 确保这是你保存 lstm_test_set_inference_results.xlsx 的正确目录
+MODEL_OUTPUT_DIR = 'D:/data/save_model/lstm_residual_model_true_newdata' # <<<< 确保这是你保存 lstm_test_set_inference_results.xlsx 的正确目录
 EXCEL_FILE_NAME = 'lstm_test_set_inference_results.xlsx'
 INPUT_EXCEL_PATH = os.path.join(MODEL_OUTPUT_DIR, EXCEL_FILE_NAME)
 
 # 输出图像的保存目录
-FIGURES_SAVE_DIR = 'D:/data/save_model/lstm_residual_model_true' # 你可以指定一个新的目录
+FIGURES_SAVE_DIR = 'D:/data/save_model/lstm_residual_model_true_newdata' # 你可以指定一个新的目录
 os.makedirs(FIGURES_SAVE_DIR, exist_ok=True)
 OUTPUT_PLOT_FILENAME = 'comparison_error_boxplot_final.png'
 OUTPUT_PLOT_PATH = os.path.join(FIGURES_SAVE_DIR, OUTPUT_PLOT_FILENAME)

@@ -68,7 +68,7 @@ def save_results_to_excel(results_dict, output_path):
         'X_real_mm', 'Y_real_mm', 'Z_real_mm',
         'sim_X_mm', 'sim_Y_mm', 'sim_Z_mm'
     ]
-    output_results_df = pd.DataFrame(results_data)
+    output_results_df = pd.DataFrame(results_dict)
     output_results_df = output_results_df[output_column_order]
 
     print(f"[信息] 正在将 {len(output_results_df)} 条结果 ({len(output_column_order)} 列) 保存到: {output_path}")
@@ -213,3 +213,51 @@ def calculate_curvatures_from_dl_v3(dl_segment, d, L0_seg, AXIAL_ACTION_SCALE=1.
          uy = 0.0
 
     return ux, uy
+
+def calculate_curvatures_from_dl_v4(dl_segment, d, L0_seg, AXIAL_ACTION_SCALE=1.0):
+
+    ux_calc = 0.0
+    uy_calc = 0.0
+
+    if abs(d) < 1e-9:
+        print("[警告] calculate_curvatures_from_dl_v3: 缆绳距离 'd' 接近于零。")
+        return ux_calc, uy_calc
+
+    # 物理缆绳的长度变化
+    dl_l1 = dl_segment[0] # 物理 l1 @ 150 deg
+    dl_l2 = dl_segment[1] # 物理 l2 @ 270 deg
+    dl_l3 = dl_segment[2] # 物理 l3 @ 30 deg
+
+    # 映射到标准0,120,240度公式的输入
+    # Standard Cable 1 (0 deg) -> effective_dl_c1
+    # Standard Cable 2 (120 deg) -> effective_dl_c2
+    # Standard Cable 3 (240 deg) -> effective_dl_c3
+    effective_dl_c1 = dl_l3  # 物理 l3 (30 deg)
+    effective_dl_c2 = dl_l1  # 物理 l1 (150 deg)
+    effective_dl_c3 = dl_l2  # 物理 l2 (270 deg)
+
+
+    avg_dl_effective = (effective_dl_c1 + effective_dl_c2 + effective_dl_c3) / 3.0
+    avg_dl_physical = (dl_l1 + dl_l2 + dl_l3) / 3.0
+    L_current_estimate = L0_seg + avg_dl_physical * AXIAL_ACTION_SCALE
+
+    if abs(L_current_estimate) < 1e-9:
+        print(f"[警告] calculate_curvatures_from_dl_v3: 当前估计长度 'L_current_estimate' ({L_current_estimate:.4f}) 接近于零。")
+        return 0.0, 0.0
+
+    Ld = L_current_estimate * d
+
+    ux_denominator = Ld * math.sqrt(3.0)
+    if abs(ux_denominator) > 1e-9:
+        ux_calc = (effective_dl_c3 - effective_dl_c2) / ux_denominator
+        # ux_calc = (dl_l2 - dl_l1) / ux_denominator
+    else:
+        ux_calc = 0.0
+
+    uy_denominator = 3.0 * Ld
+    if abs(uy_denominator) > 1e-9:
+        uy_calc = (2.0 * effective_dl_c1 - effective_dl_c2 - effective_dl_c3) / uy_denominator
+        # uy_calc = (2.0 * dl_l3 - dl_l1 - dl_l2) / uy_denominator
+    else:
+        uy_calc = 0.0
+    return ux_calc, uy_calc

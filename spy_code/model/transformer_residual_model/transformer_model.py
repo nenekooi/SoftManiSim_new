@@ -38,9 +38,9 @@ device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 print(f"使用设备: {device}")
 
 # --- 3. 配置: 修改为路径 ---
-DATA_FILE_PATH = 'D:/data/save_data_new/-x.xlsx' # 请确保这是你的数据路径
+DATA_FILE_PATH = 'D:/data/save_data_new/random_data_input.xlsx' # 请确保这是你的数据路径
 # 定义保存 Transformer 模型和 scalers 的目录
-MODEL_SAVE_DIR = 'D:/data/save_model/transformer_residual_model' # 为 Transformer 模型创建新的保存目录
+MODEL_SAVE_DIR = 'D:/data/save_model/transformer_residual_model_newdata' # 为 Transformer 模型创建新的保存目录
 os.makedirs(MODEL_SAVE_DIR, exist_ok=True)
 
 # --- 4. 加载和预处理数据 ---

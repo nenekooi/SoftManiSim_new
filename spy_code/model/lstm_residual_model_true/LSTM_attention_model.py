@@ -38,10 +38,10 @@ device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 print(f"使用设备: {device}")
 
 # --- 3. 配置: 修改为路径 ---
-DATA_FILE_PATH = 'D:/data/save_data_new/-x.xlsx' 
+DATA_FILE_PATH = 'D:/data/save_data/aaa2(u_new_5,cab=0.035,k=-2,a=0.8).xlsx' 
 
 #    定义保存 LSTM 模型和 scalers 的目录
-MODEL_SAVE_DIR = 'D:/data/lstm_residual_model_true' 
+MODEL_SAVE_DIR = 'D:/data/save_model/lstm_residual_model_true_newdata' 
 os.makedirs(MODEL_SAVE_DIR, exist_ok=True)
 
 # --- 4. 加载和预处理数据 ---

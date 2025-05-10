@@ -78,10 +78,10 @@ print(f"使用设备: {device}")
 
 # --- 4. 配置路径 ---
 # 原始数据文件路径 (与 LSTM_attention_model.py 中的一致)
-DATA_FILE_PATH = 'D:/data/save_data_new/-x.xlsx'
+DATA_FILE_PATH = 'D:/data/save_data/aaa2(u_new_5,cab=0.035,k=-2,a=0.8).xlsx'
 
 # 模型和 Scalers 保存的目录 (与 LSTM_attention_model.py 中的 MODEL_SAVE_DIR 一致)
-MODEL_SAVE_DIR = 'D:/data/save_model/lstm_residual_model_true' # <<<< 确保这是你保存模型和scaler的正确目录
+MODEL_SAVE_DIR = 'D:/data/save_model/lstm_residual_model_true_newdata' # <<<< 确保这是你保存模型和scaler的正确目录
 
 # 已训练模型的具体路径
 MODEL_LOAD_PATH = os.path.join(MODEL_SAVE_DIR, 'lstm_residual_model.pth') # <<<< 你的.pth模型文件
