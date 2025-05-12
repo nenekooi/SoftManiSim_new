@@ -17,21 +17,21 @@ from visualizer.spy_visualizer import ODE
 if __name__ == "__main__":
 
     print("--- 设置参数 ---")
-    DATA_FILE_PATH = 'D:/data/load_data/random_data.xlsx'
+    DATA_FILE_PATH = 'D:\pybullet\code\Datacollection/Processed_Data2K.xlsx'
     # DATA_FILE_PATH = 'D:/data/load_data/circle.xlsx'
     SHEET_NAME = 'Sheet1'
     # OUTPUT_RESULTS_PATH = 'D:/data/save_data/5(u_new_4,cab=0.035,k=-20,a=1).xlsx'
-    OUTPUT_RESULTS_PATH = 'D:/data/save_data/0(u_new_4,cab=0.04,k=-20,a=1).xlsx'
+    OUTPUT_RESULTS_PATH = 'D:\pybullet\code\Datacollection/2k(2).xlsx'
     
     # ---机器人参数---
     num_cables = 3 
-    cable_distance = 0.04
+    cable_distance = 0.035
     initial_length = 0.12
     number_of_segment = 1
     L0_seg = initial_length / number_of_segment
     print(f"机器人参数: L0={initial_length:.4f}m, d={cable_distance:.4f}m")
-    axial_strain_coefficient = -20
-    AXIAL_ACTION_SCALE = 1
+    axial_strain_coefficient = -2
+    AXIAL_ACTION_SCALE = 0.8
 
     #---机器人可视化参数---
     body_color = [1, 0.0, 0.0, 1]
@@ -78,7 +78,7 @@ if __name__ == "__main__":
 
     # --- 设置基座 ---
     base_pos = np.array([0, 0, 0.6])
-    base_ori_euler = np.array([-math.pi / 2.0, 0, 0])
+    base_ori_euler = np.array([-math.pi / 2.0, 0, math.pi / 4.7])
     base_ori = p.getQuaternionFromEuler(base_ori_euler)
     print(f"[设置] 基座世界坐标: {base_pos}")
     print(f"[设置] 基座世界姿态 (Euler): {base_ori_euler}")
@@ -123,7 +123,7 @@ if __name__ == "__main__":
 
         # --- 计算新形态 ---
         my_ode._reset_y0()
-        ux, uy = utils.calculate_curvatures_from_dl_v3(dl_segment, cable_distance, L0_seg, AXIAL_ACTION_SCALE)
+        ux, uy = utils.calculate_curvatures_from_dl_v4(dl_segment, cable_distance, L0_seg, AXIAL_ACTION_SCALE)
         avg_dl = np.mean(dl_segment)
         commanded_length_change = avg_dl * AXIAL_ACTION_SCALE
         
@@ -173,6 +173,6 @@ if __name__ == "__main__":
     p.disconnect(physicsClientId)
 
     # --- 保存结果 ---
-    utils.save_results_to_excel(results_data, OUTPUT_RESULTS_PATH)
+    # utils.save_results_to_excel(results_data, OUTPUT_RESULTS_PATH)
 
     print("--- 仿真结束 ---")

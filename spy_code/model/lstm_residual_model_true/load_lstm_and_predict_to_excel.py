@@ -78,22 +78,22 @@ print(f"使用设备: {device}")
 
 # --- 4. 配置路径 ---
 # 原始数据文件路径 (与 LSTM_attention_model.py 中的一致)
-DATA_FILE_PATH = 'D:/data/save_data/aaa2(u_new_5,cab=0.035,k=-2,a=0.8).xlsx'
+DATA_FILE_PATH = 'D:\data\load_data\randon_data_clean.xlsx'
 
 # 模型和 Scalers 保存的目录 (与 LSTM_attention_model.py 中的 MODEL_SAVE_DIR 一致)
-MODEL_SAVE_DIR = 'D:/data/save_model/lstm_residual_model_true_newdata' # <<<< 确保这是你保存模型和scaler的正确目录
+MODEL_SAVE_DIR = 'D:/data/save_model/lstm_residual_model_clean(1)' # <<<< 确保这是你保存模型和scaler的正确目录
 
 # 已训练模型的具体路径
-MODEL_LOAD_PATH = os.path.join(MODEL_SAVE_DIR, 'lstm_residual_model.pth') # <<<< 你的.pth模型文件
+MODEL_LOAD_PATH = os.path.join(MODEL_SAVE_DIR, 'lstm_residual_model_sim_input.pth') # <<<< 你的.pth模型文件
 
 # Scalers 的具体路径
-X_SCALER_PATH = os.path.join(MODEL_SAVE_DIR, 'lstm_x_scaler.joblib')
+X_SCALER_PATH = os.path.join(MODEL_SAVE_DIR, 'lstm_x_scaler_6features.joblib')
 RESIDUAL_SCALER_PATH = os.path.join(MODEL_SAVE_DIR, 'lstm_residual_scaler.joblib')
 
 # 输出 Excel 文件的路径和名称
 OUTPUT_EXCEL_DIR = MODEL_SAVE_DIR # 可以和模型保存在一起，或指定新目录
 os.makedirs(OUTPUT_EXCEL_DIR, exist_ok=True)
-OUTPUT_EXCEL_FILENAME = 'lstm_test_set_inference_results.xlsx'
+OUTPUT_EXCEL_FILENAME = 'final_xyz.xlsx'
 OUTPUT_EXCEL_PATH = os.path.join(OUTPUT_EXCEL_DIR, OUTPUT_EXCEL_FILENAME)
 
 # --- 5. 加载和预处理数据 (大部分复用 LSTM_attention_model.py 的逻辑) ---
@@ -222,7 +222,7 @@ if len(real_test_aligned_coords) != num_predictions:
 print("--- 正在加载已训练的 LSTM+Attention 模型 ---")
 # 与 LSTM_attention_model.py 中模型参数一致
 model_params = {
-    'input_size': X_test_seq.shape[2], # 应该为3
+    'input_size': X_test_seq.shape[6], # 应该为3
     'hidden_size': 128,
     'num_layers': 2,
     'output_size': 3, # 输出残差的维度
